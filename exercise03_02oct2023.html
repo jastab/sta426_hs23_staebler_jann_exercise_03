@@ -2,11 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Hubert Rehrauer">
+<meta name="author" content="Jann Stäbler">
 <meta name="dcterms.date" content="2023-10-02">
 
 <title>Exercise 03</title>
@@ -3035,7 +3035,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Hubert Rehrauer </p>
+             <p>Jann Stäbler </p>
           </div>
   </div>
     
@@ -3077,13 +3077,195 @@ bulk.TSA-Post-800IFC        TSA       bulk</code></pre>
 <section id="compute-and-visualize-basic-statistics-on-the-experimental-design" class="level2">
 <h2 class="anchored" data-anchor-id="compute-and-visualize-basic-statistics-on-the-experimental-design">Compute and visualize basic statistics on the experimental design</h2>
 <p>How many replicates are there for each combination of factor levels? How many genes have an expression value above 0 in each sample? Are there systematic differences between the samples in the different conditions (treatment &amp; technology). Visualize the following statistics per sample:</p>
-<p>number of detected genes</p>
-<p>total sum of counts per sample (serves as a proxy for the number of sequenced reads per sample)</p>
-<p>Color the samples by the experimental condition.</p>
+<section id="replicates" class="level3">
+<h3 class="anchored" data-anchor-id="replicates">Replicates</h3>
+<p>Samples and the numbers of the corresponding # replicates:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  Treatment Technology  n
+1      DMSO     IFC800 20
+2      DMSO      IFC96 20
+3      DMSO       bulk  3
+4       TSA     IFC800 20
+5       TSA      IFC96 20
+6       TSA       bulk  3</code></pre>
+</div>
+</div>
+</section>
+<section id="number-of-detected-genes" class="level3">
+<h3 class="anchored" data-anchor-id="number-of-detected-genes">Number of detected genes</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_x <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(x)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>genes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;num_gene_expr_higher_0&quot;</span> <span class="ot">=</span><span class="fu">colSums</span>(df_x <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="co"># the term in the bracket gives a boolean for each value, TRUE if &gt; 0 and FALSE if &lt; 0. colSums then adds the booleans for each column in the data frame (TRUE = +1, FALSE = +0). So the sum corresponds to values &gt; 0.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here are the first columns of the number of genes per sample with an expression value of &gt;0:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(genes)) <span class="co"># Overview over the first samples</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">num_gene_expr_higher_0</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Pre.96IFC</td>
+<td style="text-align: right;">15163</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Pre.96IFC</td>
+<td style="text-align: right;">15261</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Pre.800IFC</td>
+<td style="text-align: right;">15404</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Pre.800IFC</td>
+<td style="text-align: right;">16182</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Post.800IFC</td>
+<td style="text-align: right;">15202</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Post.800IFC</td>
+<td style="text-align: right;">16167</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="total-sum-of-counts-per-sample-serves-as-a-proxy-for-the-number-of-sequenced-reads-per-sample" class="level3">
+<h3 class="anchored" data-anchor-id="total-sum-of-counts-per-sample-serves-as-a-proxy-for-the-number-of-sequenced-reads-per-sample">Total sum of counts per sample (serves as a proxy for the number of sequenced reads per sample)</h3>
+<p>Here are the first columns of the number of total sum of counts per sample:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;total_counts_sum&quot;</span> <span class="ot">=</span><span class="fu">colSums</span>(df_x))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(counts))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">total_counts_sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Pre.96IFC</td>
+<td style="text-align: right;">16469072</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Pre.96IFC</td>
+<td style="text-align: right;">10899777</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Pre.800IFC</td>
+<td style="text-align: right;">22928016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Pre.800IFC</td>
+<td style="text-align: right;">21170430</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Post.800IFC</td>
+<td style="text-align: right;">16572277</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Post.800IFC</td>
+<td style="text-align: right;">21218842</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><em>Color the samples by the experimental condition.</em></p>
+</section>
 </section>
 <section id="normalize-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="normalize-the-data">Normalize the data</h2>
-<p>Scale the columns so that the total sum of all columns are identical</p>
+<section id="scale-the-columns-so-that-the-total-sum-of-all-columns-are-identical" class="level3">
+<h3 class="anchored" data-anchor-id="scale-the-columns-so-that-the-total-sum-of-all-columns-are-identical">Scale the columns so that the total sum of all columns are identical</h3>
+<p><strong>First I try with a simple data frame to understand what is going on and to make sure nothing goes wrong with our big data frames:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>testdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;1&quot;</span><span class="ot">=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">1</span>), <span class="st">&quot;2&quot;</span><span class="ot">=</span><span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">2</span>,<span class="dv">2</span>), <span class="st">&quot;3&quot;</span><span class="ot">=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">9</span>,<span class="dv">3</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>testdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  X1 X2 X3
+1  1  6  3
+2  3  2  9
+3  1  2  3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>testcount <span class="ot">&lt;-</span> <span class="fu">colSums</span>(testdf) <span class="co"># again sums over the columns</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>testcount</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X1 X2 X3 
+ 5 10 15 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>normalized_testdf <span class="ot">&lt;-</span> <span class="fu">sweep</span>(testdf,<span class="dv">2</span>,testcount,<span class="at">FUN=</span><span class="st">&quot;/&quot;</span>) <span class="co"># now we divide each value by the corresponding sum of the column it is in</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>normalized_testdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   X1  X2  X3
+1 0.2 0.6 0.2
+2 0.6 0.2 0.6
+3 0.2 0.2 0.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(normalized_testdf) <span class="co"># now, each column should add up to 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X1 X2 X3 
+ 1  1  1 </code></pre>
+</div>
+</div>
+<p><strong>Now with the real deal:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>normalized_df_x <span class="ot">&lt;-</span> <span class="fu">sweep</span>(df_x,<span class="dv">2</span>,<span class="fu">colSums</span>(df_x), <span class="at">FUN=</span><span class="st">&quot;/&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Fingers crossed that the colSums function of the now normalized data frame outputs 1 for each of the columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(<span class="fu">colSums</span>(normalized_df_x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Pre.96IFC</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Pre.96IFC</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Pre.800IFC</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Pre.800IFC</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bulk.DMSO.Post.800IFC</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bulk.TSA.Post.800IFC</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br>
+</p>
+</section>
 </section>
 <section id="transform-the-data-to-log-scale" class="level2">
 <h2 class="anchored" data-anchor-id="transform-the-data-to-log-scale">Transform the data to log-scale</h2>
